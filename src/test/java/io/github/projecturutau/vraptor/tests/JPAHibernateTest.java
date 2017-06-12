@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.h2.tools.RunScript;
@@ -16,8 +17,12 @@ import org.hibernate.jdbc.Work;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JPAHibernateTest {
+	private static final Logger logger = LoggerFactory.getLogger(JPAHibernateTest.class);
+	
 	protected static EntityManagerFactory entityManagerFactory;
 	protected static EntityManager entityManager;
 
@@ -48,5 +53,25 @@ public class JPAHibernateTest {
 		entityManager.clear();
 		entityManager.close();
 		entityManagerFactory.close();
+	}
+
+	public void initTransaction() {
+		EntityTransaction transaction = entityManager.getTransaction();
+
+		if(!transaction.isActive()) {
+			transaction.begin();
+		} else {
+			logger.info("Transaction already open!");
+		}
+	}
+
+	public void commitTransaction() {
+		EntityTransaction transaction = entityManager.getTransaction();
+
+		if(transaction.isActive()) {
+			transaction.commit();
+		} else {
+			logger.info("Have none transaction open");
+		}
 	}
 }

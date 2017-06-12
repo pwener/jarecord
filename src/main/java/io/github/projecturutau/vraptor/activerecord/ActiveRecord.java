@@ -15,23 +15,23 @@ import org.slf4j.LoggerFactory;
 
 import io.github.projecturutau.vraptor.activerecord.finder.Finder;
 
-public abstract class ActiveRecord<T> {
+public abstract class ActiveRecord<ActiveType> implements Cloneable {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveRecord.class);
 
 	// Used to get class type of Entity
-	private final Class<T> entityClass;
+	private final Class<ActiveType> entityClass;
 
 	@Inject
-	private EntityManager entityManager;
-
+	private static EntityManager entityManager;
+	
 	private Finder finder;
 
 	/**
 	 * Set with reflection, which Object type is Entity
 	 */
 	public ActiveRecord() {
-		this.entityClass = (Class<T>) ((ParameterizedType) getClass()
+		this.entityClass = (Class<ActiveType>) ((ParameterizedType) getClass()
 				.getGenericSuperclass()).getActualTypeArguments()[0];
 
 		this.finder = new Finder(entityClass, entityManager);
@@ -43,15 +43,15 @@ public abstract class ActiveRecord<T> {
 	 * @return true if operation do not throw any exception
 	 */
 	public Object create() {
-
 		logger.info("Creating one " + entityClass.getName());
 
 		try {
-			entityManager.persist(this);
-		} catch (IllegalArgumentException illegalArgumentException) {
-			throw new IllegalArgumentException("An invalid param has been passed to create method");
-		} catch (EntityExistsException entityExistsException) {
-			entityExistsException.printStackTrace();
+			execute(entityManager -> {
+				entityManager.persist(this);
+				return null;
+			});
+		} catch(EntityExistsException e) {
+			throw new EntityExistsException("Entity already persisted");
 		}
 
 		return this;
@@ -63,9 +63,12 @@ public abstract class ActiveRecord<T> {
 	 * @param Entity removed
 	 */
 	public void destroy() {
-		entityManager.remove(this);
+		execute(entityManager -> {
+			entityManager.remove(ActiveRecord.this);
+			return null;
+		});
 	}
-
+	
 	/**
 	 * Gets entities found with these params
 	 *  
@@ -94,6 +97,14 @@ public abstract class ActiveRecord<T> {
 	 * Set used entity manager
 	 */
 	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
+		ActiveRecord.entityManager = entityManager;
+	}
+	
+	public static EntityManager getEntityManager() {
+		return entityManager;
+	}
+	
+	protected static <Type> Type execute(Executor<Type> executor) {
+		return executor.execute(getEntityManager());
 	}
 }

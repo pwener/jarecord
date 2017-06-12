@@ -1,5 +1,9 @@
 package io.github.projecturutau.vraptor.tests;
 
+import java.util.List;
+
+import javax.persistence.EntityExistsException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +17,11 @@ public class PersistTest extends JPAHibernateTest {
 	public void setUp() {
 		this.sample = new Sample();
 		this.sample.setEntityManager(entityManager);
+
+		System.out.println("Init with follow samples:");
+		for (Sample s : getResults()) {
+			System.out.println("Sample avaliable: " + s.getId());
+		}
 	}
 
 	@Test
@@ -23,10 +32,41 @@ public class PersistTest extends JPAHibernateTest {
 
 		Assert.assertNotNull(entityManager.find(Sample.class, 2));
 	}
+	
+	@Test(expected=EntityExistsException.class)
+	public void testInvalidCreate() {
+		final Integer copiedIdentifier = 666; 
+
+		Sample original = new Sample();
+		original.setId(copiedIdentifier);
+		original.create();
+		
+		Sample duplicated = new Sample();
+		duplicated.setId(copiedIdentifier);
+		duplicated.create();
+	}
+
+	@Test
+	public void testUpdate() {
+		Sample updateSample = entityManager.find(Sample.class, 5);
+
+		updateSample.setTitle("Testing update");
+
+		Assert.assertEquals("Testing update",
+				entityManager.find(Sample.class, 5).getTitle());
+	}
 
 	@Test
 	public void testDestroy() {
-		// TODO
+		Sample deathSample = entityManager.find(Sample.class, 1);
+
+		deathSample.destroy();
+
+		Assert.assertNull(entityManager.find(Sample.class, 1));
 	}
 
+	@SuppressWarnings("unchecked")
+	private List<Sample> getResults() {
+		return entityManager.createQuery("Select s from Sample s").getResultList();
+	}
 }
