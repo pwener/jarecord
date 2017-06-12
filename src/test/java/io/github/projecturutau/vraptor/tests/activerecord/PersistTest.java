@@ -1,4 +1,4 @@
-package io.github.projecturutau.vraptor.tests;
+package io.github.projecturutau.vraptor.tests.activerecord;
 
 import java.util.List;
 
@@ -9,6 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.github.projecturutau.vraptor.model.Sample;
+import io.github.projecturutau.vraptor.model.SampleNotEntity;
+import io.github.projecturutau.vraptor.tests.JPAHibernateTest;
 
 public class PersistTest extends JPAHibernateTest {
 	private Sample sample;
@@ -34,7 +36,7 @@ public class PersistTest extends JPAHibernateTest {
 	}
 	
 	@Test(expected=EntityExistsException.class)
-	public void testInvalidCreate() {
+	public void testDuplicatedCreateException() {
 		final Integer copiedIdentifier = 666; 
 
 		Sample original = new Sample();
@@ -44,6 +46,13 @@ public class PersistTest extends JPAHibernateTest {
 		Sample duplicated = new Sample();
 		duplicated.setId(copiedIdentifier);
 		duplicated.create();
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testInvalidArgumentCreateException() {
+		SampleNotEntity notEntity = new SampleNotEntity();
+		notEntity.setId(7L);
+		notEntity.create();
 	}
 
 	@Test
