@@ -10,6 +10,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.github.projecturutau.vraptor.activerecord.finder.Options;
+import io.github.projecturutau.vraptor.activerecord.finder.OrderEnum;
 import io.github.projecturutau.vraptor.model.Sample;
 import io.github.projecturutau.vraptor.tests.JPAHibernateTest;
 
@@ -56,6 +58,8 @@ public class FinderTest extends JPAHibernateTest {
 	@Test
 	public void testFindByPrimaryKey() {
 		Assert.assertNotNull(Sample.find(1));
+		
+		Assert.assertEquals("Sample to delete", ((Sample) Sample.find(1)).getTitle());
 	}
 	
 	@Test
@@ -68,5 +72,20 @@ public class FinderTest extends JPAHibernateTest {
 		Assert.assertNotNull(Sample.findBy("id", 1));
 		
 		Assert.assertNull(Sample.findBy("title", "xpto"));
+	}
+
+	@Test
+	public void testFindByWithOptions() {
+		Options firstOptions = new Options("title", "Sample to delete", "id", OrderEnum.DESC);
+		Assert.assertEquals(1, Sample.findBy(firstOptions).getResultList().size());
+		
+		Options secOptions = new Options("title", "Sample%", "id", OrderEnum.DESC);
+		Assert.assertEquals(2, Sample.findBy(secOptions).getResultList().size());
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testFindByWithOptionsException() {
+		Options options = new Options("wrong_attr", "Sample%", "id", OrderEnum.DESC);
+		Sample.findBy(options);
 	}
 }
