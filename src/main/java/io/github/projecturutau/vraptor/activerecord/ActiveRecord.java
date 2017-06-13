@@ -136,7 +136,12 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	}
 
 	/**
-	 * Used to create customized find
+	 * Used to create customized find. With this method you could create
+	 * a find with options using pattern string to LIKE queries, by example:
+	 * 
+	 * new Options("title", "Sample%");
+	 * 
+	 * It will use % like multi character wildcards.
 	 * 
 	 * @param options customized params of search
 	 * @return Active
@@ -144,11 +149,16 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	public static Query findBy(Options options) {
 		logger.info("Running a customizable finder");
 
-		final String sql = "SELECT entity FROM " + getClassName()
+		String sql = "SELECT entity FROM " + getClassName()
 				+ " entity WHERE entity."
-				+ options.getAttribute() + " LIKE '" + options.getAttributeValue() + "' "
-				+ " ORDER BY " + options.getOrderAtribute()
+				+ options.getAttribute() + " LIKE '" + options.getAttributeValue() + "' ";
+
+		if(options.isOrdanable()) {
+			sql += " ORDER BY " + options.getOrderAtribute() 
 				+ " " + options.getOrder().toString();
+		} else {
+			logger.debug("Is not ordenable");
+		}
 
 		logger.info(sql);
 

@@ -81,6 +81,12 @@ public class FinderTest extends JPAHibernateTest {
 		
 		Options secOptions = new Options("title", "Sample%", "id", OrderEnum.DESC);
 		Assert.assertEquals(2, Sample.findBy(secOptions).getResultList().size());
+		
+		Options thirdOptions = new Options("title", "Sample%");
+		Assert.assertEquals(2, Sample.findBy(thirdOptions).getResultList().size());
+		
+		Options fourthOptions = new Options("title", "Sample%", "id");
+		Assert.assertEquals(2, Sample.findBy(fourthOptions).getResultList().size());
 	}
 	
 	@Test(expected=IllegalArgumentException.class)

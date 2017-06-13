@@ -5,12 +5,29 @@ public class Options {
 	private Object attributeValue;
 	private String orderAtribute;
 	private OrderEnum order;
+	private boolean isOrdanable;
 
 	public Options(String attribute, Object value, String orderAtribute, OrderEnum orderType) {
 		this.attribute = attribute;
 		this.attributeValue = value;
 		this.orderAtribute = orderAtribute;
 		this.order = orderType;
+		setOrdanable(true);
+	}
+
+	public Options(String attribute, Object value, String orderAtribute) {
+		this.attribute = attribute;
+		this.attributeValue = value;
+		this.orderAtribute = orderAtribute;
+		// ASC is default
+		this.order = OrderEnum.ASC;
+		setOrdanable(true);
+	}
+
+	public Options(String attribute, Object value) {
+		this.attribute = attribute;
+		this.attributeValue = value;
+		setOrdanable(false);
 	}
 
 	public String getAttribute() {
@@ -43,5 +60,13 @@ public class Options {
 
 	public void setOrder(OrderEnum order) {
 		this.order = order;
+	}
+
+	public boolean isOrdanable() {
+		return isOrdanable;
+	}
+
+	public void setOrdanable(boolean isOrdanable) {
+		this.isOrdanable = isOrdanable;
 	}
 }
