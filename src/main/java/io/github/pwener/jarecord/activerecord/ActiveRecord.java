@@ -1,5 +1,7 @@
 package io.github.pwener.jarecord.activerecord;
 
+import static javax.enterprise.inject.spi.CDI.current;
+
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -31,11 +33,9 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	// Used to get class type of Entity
 	private final Class<ActiveType> entityClass;
 
-	@Inject
-	private static EntityManager entityManager;
+	private EntityManager entityManager;
 
-	@Inject
-	private static Finder finder;
+	private Finder finder;
 
 	/**
 	 * Set with reflection, which Object type is Entity
@@ -96,7 +96,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 		List<Entity> results = new ArrayList<>();
 
 		for(String key : params.keySet()) {
-			List<Entity> paramsResult = finder.get(key, params.get(key));
+			List<Entity> paramsResult = getFinder().get(key, params.get(key));
 			results.addAll(paramsResult);
 		}
 
@@ -109,7 +109,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	 * @param primary key of object
 	 */
 	public static ActiveRecord<?> find(Object primaryKey) {
-		return (ActiveRecord<?>) finder.find(primaryKey);
+		return (ActiveRecord<?>) getFinder().find(primaryKey);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 		ActiveRecord<Entity> result = null;
 
 		List<ActiveRecord<Entity>> allResults = new ArrayList<>();
-		allResults.addAll((Collection<? extends ActiveRecord<Entity>>) finder.get(attr, value));
+		allResults.addAll((Collection<? extends ActiveRecord<Entity>>) getFinder().get(attr, value));
 
 		if(!allResults.isEmpty()) {
 			result = allResults.get(FIRST);
@@ -166,7 +166,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 		Query query = null;
 
 		try {
-			query = entityManager.createQuery(sql);
+			query = entityManager().createQuery(sql);
 		} catch(IllegalArgumentException illegalArgumentException) {
 			throw new IllegalArgumentException("Please, verify your options values.");
 		}
@@ -180,7 +180,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	 * @return one List of all instance
 	 */
 	public static List<Entity> all() {
-		return finder.all();
+		return getFinder().all();
 	}
 	
 	private static String getClassName() {
@@ -190,19 +190,37 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	/**
 	 * Set used entity manager
 	 */
-	@SuppressWarnings("static-access")
+	@Inject
 	public void setEntityManager(EntityManager entityManager) {
 		// this set is only for tests
 		this.finder.setEntityManager(entityManager);
 
-		ActiveRecord.entityManager = entityManager;
+		this.entityManager = entityManager;
 	}
 
-	public static EntityManager getEntityManager() {
+	public EntityManager getEntityManager() {
 		return entityManager;
 	}
 
-	private static <Type> Type execute(Executor<Type> executor) {
+	@Inject
+	public void setFinder(Finder finder) {
+		this.finder = finder;
+	}
+
+	private <Type> Type execute(Executor<Type> executor) {
 		return executor.execute(getEntityManager());
 	}
+
+	private static Finder getFinder() {
+		return current().select(Finder.class).get();
+	}
+
+	/**
+	 * Static reference to entityManager
+	 * @return
+	 */
+	private static EntityManager entityManager() {
+		return current().select(EntityManager.class).get();
+	}
+
 }

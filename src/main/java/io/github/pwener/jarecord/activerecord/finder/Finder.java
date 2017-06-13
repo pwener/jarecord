@@ -2,6 +2,7 @@ package io.github.pwener.jarecord.activerecord.finder;
 
 import java.util.List;
 
+import javax.enterprise.context.RequestScoped;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.pwener.jarecord.activerecord.ActiveRecord;
 
+@RequestScoped
 public class Finder {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveRecord.class);
