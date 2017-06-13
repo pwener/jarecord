@@ -1,4 +1,4 @@
-package io.github.projecturutau.vraptor.tests.activerecord;
+package io.github.pwener.jarecord.tests.activerecord;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,10 +10,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.github.projecturutau.vraptor.activerecord.finder.Options;
-import io.github.projecturutau.vraptor.activerecord.finder.OrderEnum;
-import io.github.projecturutau.vraptor.model.Sample;
-import io.github.projecturutau.vraptor.tests.JPAHibernateTest;
+import io.github.pwener.jarecord.activerecord.finder.Options;
+import io.github.pwener.jarecord.activerecord.finder.OrderEnum;
+import io.github.pwener.jarecord.model.Sample;
+import io.github.pwener.jarecord.tests.JPAHibernateTest;
 
 public class FinderTest extends JPAHibernateTest {
 	private Sample sample;

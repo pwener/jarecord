@@ -1,4 +1,4 @@
-package io.github.projecturutau.vraptor.activerecord.finder;
+package io.github.pwener.jarecord.activerecord.finder;
 
 public class Options {
 	private String attribute;

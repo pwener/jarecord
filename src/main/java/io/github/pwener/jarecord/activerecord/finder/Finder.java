@@ -1,4 +1,4 @@
-package io.github.projecturutau.vraptor.activerecord.finder;
+package io.github.pwener.jarecord.activerecord.finder;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.projecturutau.vraptor.activerecord.ActiveRecord;
+import io.github.pwener.jarecord.activerecord.ActiveRecord;
 
 public class Finder {
 

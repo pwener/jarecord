@@ -1,9 +1,9 @@
-package io.github.projecturutau.vraptor.model;
+package io.github.pwener.jarecord.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import io.github.projecturutau.vraptor.activerecord.ActiveRecord;
+import io.github.pwener.jarecord.activerecord.ActiveRecord;
 
 @Entity
 public class Sample extends ActiveRecord<Sample> {

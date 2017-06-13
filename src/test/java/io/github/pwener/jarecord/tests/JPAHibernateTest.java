@@ -1,4 +1,4 @@
-package io.github.projecturutau.vraptor.tests;
+package io.github.pwener.jarecord.tests;
 
 import java.io.File;
 import java.io.FileNotFoundException;

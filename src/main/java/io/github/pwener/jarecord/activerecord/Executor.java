@@ -1,4 +1,4 @@
-package io.github.projecturutau.vraptor.activerecord;
+package io.github.pwener.jarecord.activerecord;
 
 import javax.persistence.EntityManager;
 

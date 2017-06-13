@@ -1,6 +1,6 @@
-package io.github.projecturutau.vraptor.model;
+package io.github.pwener.jarecord.model;
 
-import io.github.projecturutau.vraptor.activerecord.ActiveRecord;
+import io.github.pwener.jarecord.activerecord.ActiveRecord;
 
 public class SampleNotEntity extends ActiveRecord {
 	private Long id;

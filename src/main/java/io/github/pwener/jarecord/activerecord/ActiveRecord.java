@@ -1,4 +1,4 @@
-package io.github.projecturutau.vraptor.activerecord;
+package io.github.pwener.jarecord.activerecord;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
@@ -16,8 +16,8 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.projecturutau.vraptor.activerecord.finder.Finder;
-import io.github.projecturutau.vraptor.activerecord.finder.Options;
+import io.github.pwener.jarecord.activerecord.finder.Finder;
+import io.github.pwener.jarecord.activerecord.finder.Options;
 
 public abstract class ActiveRecord<ActiveType> implements Serializable{
 
@@ -120,6 +120,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	 * 
 	 * @return first matched found with this attribute or null
 	 */
+	@SuppressWarnings("unchecked")
 	public static ActiveRecord<Entity> findBy(String attr, Object value) {
 		ActiveRecord<Entity> result = null;
 

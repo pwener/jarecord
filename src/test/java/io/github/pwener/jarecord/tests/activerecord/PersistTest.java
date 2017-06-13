@@ -1,4 +1,4 @@
-package io.github.projecturutau.vraptor.tests.activerecord;
+package io.github.pwener.jarecord.tests.activerecord;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.github.projecturutau.vraptor.model.Sample;
-import io.github.projecturutau.vraptor.model.SampleNotEntity;
-import io.github.projecturutau.vraptor.tests.JPAHibernateTest;
+import io.github.pwener.jarecord.model.Sample;
+import io.github.pwener.jarecord.model.SampleNotEntity;
+import io.github.pwener.jarecord.tests.JPAHibernateTest;
 
 public class PersistTest extends JPAHibernateTest {
 	private Sample sample;
