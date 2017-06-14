@@ -1,5 +1,6 @@
 package io.github.pwener.jarecord.activerecord.finder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -46,7 +47,7 @@ public class Finder {
 	 * @return Object correspondent to Entity defined by DAO
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Entity> get(String field, Object value) {
+	public ArrayList<Entity> get(String field, Object value) {
 		List<Entity> results = null;
 
 		if (value != null) {
@@ -59,7 +60,7 @@ public class Finder {
 			throw new IllegalArgumentException("You was pass a null value like parameter");
 		}
 
-		return results;
+		return (ArrayList<Entity>) results;
 	}
 
 	@SuppressWarnings("unchecked")
