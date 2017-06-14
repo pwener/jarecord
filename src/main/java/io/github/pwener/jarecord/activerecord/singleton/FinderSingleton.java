@@ -1,5 +1,6 @@
-package io.github.pwener.jarecord.activerecord;
+package io.github.pwener.jarecord.activerecord.singleton;
 
+import io.github.pwener.jarecord.activerecord.ActiveRecord;
 import io.github.pwener.jarecord.activerecord.finder.Finder;
 
 /**

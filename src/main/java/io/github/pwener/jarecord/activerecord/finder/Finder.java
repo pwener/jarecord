@@ -3,6 +3,7 @@ package io.github.pwener.jarecord.activerecord.finder;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -10,22 +11,25 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.pwener.jarecord.activerecord.ActiveRecord;
-
 @RequestScoped
 public class Finder {
+	private static final Logger logger = LoggerFactory.getLogger(Finder.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(ActiveRecord.class);
-
-	private EntityManager entityManager;
-	
-	private Class<?> entityClass;
-	
-	// Used in SQL to be replaced by real parameter of search
 	private static final String PARAMETER_NAME = "value";
 
-	public Finder(Class<?> entityClass, EntityManager entityManager) {
-		this.entityClass = entityClass;
+	private final EntityManager entityManager;
+
+	private Class<?> entityClass;
+
+	/**
+     * @deprecated CDI only
+     */
+	public Finder() {
+		this(null);
+	}
+
+	@Inject
+	public Finder(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 
@@ -52,7 +56,7 @@ public class Finder {
 
 			results = query.getResultList();
 		} else {
-			throw new IllegalArgumentException("You pass a null value inside your parameters");
+			throw new IllegalArgumentException("You was pass a null value like parameter");
 		}
 
 		return results;
@@ -84,7 +88,7 @@ public class Finder {
         return sql;
     }
 
-	public void setEntityManager(EntityManager manager) {
-		this.entityManager = manager;
+    public void setEntityClass(Class<?> entityClass) {
+		this.entityClass = entityClass;
 	}
 }

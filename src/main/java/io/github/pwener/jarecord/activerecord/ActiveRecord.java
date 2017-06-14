@@ -1,7 +1,5 @@
 package io.github.pwener.jarecord.activerecord;
 
-import static javax.enterprise.inject.spi.CDI.current;
-
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -20,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import io.github.pwener.jarecord.activerecord.finder.Finder;
 import io.github.pwener.jarecord.activerecord.finder.Options;
+import io.github.pwener.jarecord.activerecord.singleton.EntityManagerSingleton;
+import io.github.pwener.jarecord.activerecord.singleton.FinderSingleton;
 
 public abstract class ActiveRecord<ActiveType> implements Serializable {
 
@@ -36,16 +36,6 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	 *  Used to get class type of Entity
 	 */
 	private final Class<ActiveType> entityClass;
-
-	/**
-	 * Injected into set method {@link #setEntityManager(EntityManager)}
-	 */
-	private EntityManager entityManager;
-
-	/**
-	 * Injected into set method {@link #setFinder(Finder)}
-	 */
-	private Finder finder;
 
 	/**
 	 * Set with reflection, which Object type is Entity
@@ -83,8 +73,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	/**
 	 * Delete the entity instance from database.
 	 * 
-	 * @param Entity
-	 *            removed
+	 * @param Entity removed
 	 */
 	public void destroy() {
 		execute(entityManager -> {
@@ -96,8 +85,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	/**
 	 * Gets entities found with these params
 	 * 
-	 * @param params
-	 *            refers to attributes of object
+	 * @param params refers to attributes of object
 	 * 
 	 * @return all instances found
 	 */
@@ -115,8 +103,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	/**
 	 * Gets unique entity by your primary key
 	 * 
-	 * @param primary
-	 *            key of object
+	 * @param primary key of object
 	 */
 	public static ActiveRecord<?> find(Object primaryKey) {
 		return (ActiveRecord<?>) FinderSingleton.get().find(primaryKey);
@@ -125,10 +112,8 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	/**
 	 * Finds first matched occurrence
 	 * 
-	 * @param attr
-	 *            Attribute name
-	 * @param value
-	 *            Attribute value
+	 * @param attr Attribute name
+	 * @param value Attribute value
 	 * 
 	 * @return first matched found with this attribute or null
 	 */
@@ -156,8 +141,8 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	 * 
 	 * It will use % like multi character wildcards.
 	 * 
-	 * @param options
-	 *            customized params of search
+	 * @param options customized params of search
+	 * 
 	 * @return Active
 	 */
 	public static Query findBy(Options options) {
@@ -177,7 +162,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 		Query query = null;
 
 		try {
-			query = entityManager().createQuery(sql);
+			query = EntityManagerSingleton.get().createQuery(sql);
 		} catch (IllegalArgumentException illegalArgumentException) {
 			throw new IllegalArgumentException("Please, verify your options values.");
 		}
@@ -203,29 +188,18 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	 */
 	@Inject
 	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
-
-	public EntityManager getEntityManager() {
-		return entityManager;
+		EntityManagerSingleton.push(entityManager);
 	}
 
 	@Inject
 	public void setFinder(Finder finder) {
-		FinderSingleton.push(finder);
+		Finder myOwnfinder = finder;
+		myOwnfinder.setEntityClass(entityClass);
+
+		FinderSingleton.push(myOwnfinder);
 	}
 
 	private <Type> Type execute(Executor<Type> executor) {
-		return executor.execute(getEntityManager());
+		return executor.execute(EntityManagerSingleton.get());
 	}
-
-	/**
-	 * Static reference to entityManager
-	 * 
-	 * @return
-	 */
-	private static EntityManager entityManager() {
-		return current().select(EntityManager.class).get();
-	}
-
 }
