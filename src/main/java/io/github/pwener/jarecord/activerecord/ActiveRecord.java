@@ -124,7 +124,9 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 		ActiveRecord<Entity> result = null;
 
 		List<ActiveRecord<Entity>> allResults = new ArrayList<>();
-		allResults.addAll((Collection<? extends ActiveRecord<Entity>>) FinderSingleton.get().get(attr, value));
+		allResults.addAll(
+				(ArrayList<? extends ActiveRecord<Entity>>) FinderSingleton.get()
+					.get(attr, value));
 
 		if (!allResults.isEmpty()) {
 			result = allResults.get(FIRST);
