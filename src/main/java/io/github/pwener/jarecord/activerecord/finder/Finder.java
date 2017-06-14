@@ -12,6 +12,8 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.pwener.jarecord.activerecord.ActiveRecord;
+
 @RequestScoped
 public class Finder {
 	private static final Logger logger = LoggerFactory.getLogger(Finder.class);
@@ -47,8 +49,8 @@ public class Finder {
 	 * @return Object correspondent to Entity defined by DAO
 	 */
 	@SuppressWarnings("unchecked")
-	public ArrayList<Entity> get(String field, Object value) {
-		List<Entity> results = null;
+	public ArrayList<ActiveRecord<?>> get(String field, Object value) {
+		List<ActiveRecord<?>> results = null;
 
 		if (value != null) {
 			final String sql = getSelectQuery(entityClass, field);
@@ -60,7 +62,7 @@ public class Finder {
 			throw new IllegalArgumentException("You was pass a null value like parameter");
 		}
 
-		return (ArrayList<Entity>) results;
+		return (ArrayList<ActiveRecord<?>>) results;
 	}
 
 	@SuppressWarnings("unchecked")

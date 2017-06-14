@@ -3,7 +3,6 @@ package io.github.pwener.jarecord.activerecord;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -91,11 +90,11 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	 * 
 	 * @return all instances found
 	 */
-	public static List<Entity> where(HashMap<String, Object> params) {
-		List<Entity> results = new ArrayList<>();
+	public static List<ActiveRecord<?>> where(HashMap<String, Object> params) {
+		List<ActiveRecord<?>> results = new ArrayList<>();
 
 		for (String key : params.keySet()) {
-			List<Entity> paramsResult = FinderSingleton.get().get(key, params.get(key));
+			List<ActiveRecord<?>> paramsResult = FinderSingleton.get().get(key, params.get(key));
 			results.addAll(paramsResult);
 		}
 
@@ -119,12 +118,10 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	 * 
 	 * @return first matched found with this attribute or null
 	 */
-	public static ActiveRecord findBy(String attr, Object value) {
-		ActiveRecord result = null;
+	public static ActiveRecord<?> findBy(String attr, Object value) {
+		ActiveRecord<?> result = null;
 
-		List<ActiveRecord> allResults = new ArrayList<>();
-		allResults.addAll((ArrayList<? extends ActiveRecord>) FinderSingleton.get()
-					.get(attr, value));
+		List<ActiveRecord<?>> allResults = FinderSingleton.get().get(attr, value);
 
 		if (!allResults.isEmpty()) {
 			result = allResults.get(FIRST);

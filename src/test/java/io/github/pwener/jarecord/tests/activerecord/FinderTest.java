@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.github.pwener.jarecord.activerecord.ActiveRecord;
 import io.github.pwener.jarecord.activerecord.finder.Finder;
 import io.github.pwener.jarecord.activerecord.finder.Options;
 import io.github.pwener.jarecord.activerecord.finder.OrderEnum;
@@ -32,7 +33,7 @@ public class FinderTest extends JPAHibernateTest {
 		params.put("id", 1);
 		params.put("title", "Sample to update");
 
-		List<Entity> samples = new ArrayList<>();
+		List<ActiveRecord<?>> samples = new ArrayList<>();
 		samples.addAll(Sample.where(params));
 
 		Assert.assertEquals(2, samples.size());
@@ -43,7 +44,7 @@ public class FinderTest extends JPAHibernateTest {
 		HashMap<String, Object> params = new HashMap<>();
 		params.put("id", 1);
 
-		List<Entity> samples = new ArrayList<>();
+		List<ActiveRecord<?>> samples = new ArrayList<>();
 		samples.addAll(Sample.where(params));
 
 		Assert.assertEquals(1, samples.size());
