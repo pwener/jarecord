@@ -43,10 +43,12 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	@SuppressWarnings({ "unchecked" })
 	public ActiveRecord() {
 		try {
-			this.entityClass = (Class<ActiveType>) ((ParameterizedType) getClass().getGenericSuperclass())
+			this.entityClass = (Class<ActiveType>) ((ParameterizedType) getClass()
+					.getGenericSuperclass())
 					.getActualTypeArguments()[0];
 		} catch (ClassCastException classCastException) {
-			throw new IllegalArgumentException(getClassName() + " must be one @Entity, please use annotation.");
+			throw new IllegalArgumentException(getClassName() 
+					+ " must be one @Entity, please use annotation.");
 		}
 	}
 
@@ -122,7 +124,8 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 		ActiveRecord<Entity> result = null;
 
 		List<ActiveRecord<Entity>> allResults = new ArrayList<>();
-		allResults.addAll((Collection<? extends ActiveRecord<Entity>>) FinderSingleton.get().get(attr, value));
+		allResults.addAll((Collection<? extends ActiveRecord<Entity>>) 
+				FinderSingleton.get().get(attr, value));
 
 		if (!allResults.isEmpty()) {
 			result = allResults.get(FIRST);
@@ -148,11 +151,13 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	public static Query findBy(Options options) {
 		logger.info("Running a customizable finder");
 
-		String sql = "SELECT entity FROM " + getClassName() + " entity WHERE entity." + options.getAttribute()
+		String sql = "SELECT entity FROM " + getClassName() 
+				+ " entity WHERE entity." + options.getAttribute()
 				+ " LIKE '" + options.getAttributeValue() + "' ";
 
 		if (options.isOrdanable()) {
-			sql += " ORDER BY " + options.getOrderAtribute() + " " + options.getOrder().toString();
+			sql += " ORDER BY " + options.getOrderAtribute() 
+				+ " " + options.getOrder().toString();
 		} else {
 			logger.debug("Is not ordenable");
 		}
@@ -179,13 +184,6 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 		return FinderSingleton.get().all();
 	}
 
-	private static String getClassName() {
-		return Thread.currentThread().getStackTrace()[2].getClassName();
-	}
-
-	/**
-	 * Set used entity manager
-	 */
 	@Inject
 	public void setEntityManager(EntityManager entityManager) {
 		EntityManagerSingleton.push(entityManager);
@@ -199,6 +197,13 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 		FinderSingleton.push(myOwnfinder);
 	}
 
+	private static String getClassName() {
+		return Thread.currentThread().getStackTrace()[2].getClassName();
+	}
+
+	/**
+	 * Interface to support lambda function
+	 */
 	private <Type> Type execute(Executor<Type> executor) {
 		return executor.execute(EntityManagerSingleton.get());
 	}
