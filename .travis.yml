@@ -1,0 +1,16 @@
+language: java
+
+script: mvn package && mvn clean compile cobertura:cobertura
+
+env:
+      global:
+              - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+      jdk:
+            - oraclejdk8
+
+
+      install: /bin/true
+
+      after_success:
+              - bash <(curl -s https://codecov.io/bash)
