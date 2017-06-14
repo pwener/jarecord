@@ -123,7 +123,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 		ActiveRecord result = null;
 
 		List<ActiveRecord> allResults = new ArrayList<>();
-		allResults.addAll((Collection<? extends ActiveRecord>) FinderSingleton.get()
+		allResults.addAll((ArrayList<? extends ActiveRecord>) FinderSingleton.get()
 					.get(attr, value));
 
 		if (!allResults.isEmpty()) {
