@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.github.pwener.jarecord.activerecord.finder.Finder;
 import io.github.pwener.jarecord.activerecord.finder.Options;
 import io.github.pwener.jarecord.activerecord.finder.OrderEnum;
 import io.github.pwener.jarecord.model.Sample;
@@ -22,6 +23,7 @@ public class FinderTest extends JPAHibernateTest {
 	public void setUp() {
 		this.sample = new Sample();
 		this.sample.setEntityManager(entityManager);
+		this.sample.setFinder(new Finder(entityManager));
 	}
 
 	@Test

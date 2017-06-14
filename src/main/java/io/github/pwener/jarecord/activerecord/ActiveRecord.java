@@ -18,39 +18,38 @@ import org.slf4j.LoggerFactory;
 
 import io.github.pwener.jarecord.activerecord.finder.Finder;
 import io.github.pwener.jarecord.activerecord.finder.Options;
+import io.github.pwener.jarecord.activerecord.singleton.EntityManagerSingleton;
+import io.github.pwener.jarecord.activerecord.singleton.FinderSingleton;
 
-public abstract class ActiveRecord<ActiveType> implements Serializable{
+public abstract class ActiveRecord<ActiveType> implements Serializable {
 
 	private static final long serialVersionUID = 6819093423193006048L;
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveRecord.class);
-	
-	// Used like index to get first result of search
+
+	/**
+	 * Used like index to get first result of {@link #findBy(String, Object)}
+	 */
 	private static final int FIRST = 0;
 
-	// Used to get class type of Entity
+	/**
+	 *  Used to get class type of Entity
+	 */
 	private final Class<ActiveType> entityClass;
-
-	@Inject
-	private static EntityManager entityManager;
-
-	@Inject
-	private static Finder finder;
 
 	/**
 	 * Set with reflection, which Object type is Entity
 	 */
-	@SuppressWarnings({ "unchecked", "static-access" })
+	@SuppressWarnings({ "unchecked" })
 	public ActiveRecord() {
-		try{
+		try {
 			this.entityClass = (Class<ActiveType>) ((ParameterizedType) getClass()
-				.getGenericSuperclass()).getActualTypeArguments()[0];
+					.getGenericSuperclass())
+					.getActualTypeArguments()[0];
 		} catch (ClassCastException classCastException) {
 			throw new IllegalArgumentException(getClassName() 
 					+ " must be one @Entity, please use annotation.");
 		}
-
-		this.finder = new Finder(entityClass, entityManager);
 	}
 
 	/**
@@ -66,7 +65,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 				entityManager.persist(this);
 				return null;
 			});
-		} catch(EntityExistsException e) {
+		} catch (EntityExistsException e) {
 			throw new EntityExistsException("Entity already persisted");
 		}
 
@@ -87,7 +86,7 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 
 	/**
 	 * Gets entities found with these params
-	 *  
+	 * 
 	 * @param params refers to attributes of object
 	 * 
 	 * @return all instances found
@@ -95,8 +94,8 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	public static List<Entity> where(HashMap<String, Object> params) {
 		List<Entity> results = new ArrayList<>();
 
-		for(String key : params.keySet()) {
-			List<Entity> paramsResult = finder.get(key, params.get(key));
+		for (String key : params.keySet()) {
+			List<Entity> paramsResult = FinderSingleton.get().get(key, params.get(key));
 			results.addAll(paramsResult);
 		}
 
@@ -109,12 +108,12 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	 * @param primary key of object
 	 */
 	public static ActiveRecord<?> find(Object primaryKey) {
-		return (ActiveRecord<?>) finder.find(primaryKey);
+		return (ActiveRecord<?>) FinderSingleton.get().find(primaryKey);
 	}
 
 	/**
 	 * Finds first matched occurrence
-	 *  
+	 * 
 	 * @param attr Attribute name
 	 * @param value Attribute value
 	 * 
@@ -125,9 +124,10 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 		ActiveRecord<Entity> result = null;
 
 		List<ActiveRecord<Entity>> allResults = new ArrayList<>();
-		allResults.addAll((Collection<? extends ActiveRecord<Entity>>) finder.get(attr, value));
+		allResults.addAll((Collection<? extends ActiveRecord<Entity>>) 
+				FinderSingleton.get().get(attr, value));
 
-		if(!allResults.isEmpty()) {
+		if (!allResults.isEmpty()) {
 			result = allResults.get(FIRST);
 		} else {
 			// do nothing, return null
@@ -137,24 +137,25 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	}
 
 	/**
-	 * Used to create customized find. With this method you could create
-	 * a find with options using pattern string to LIKE queries, by example:
+	 * Used to create customized find. With this method you could create a find
+	 * with options using pattern string to LIKE queries, by example:
 	 * 
 	 * new Options("title", "Sample%");
 	 * 
 	 * It will use % like multi character wildcards.
 	 * 
 	 * @param options customized params of search
+	 * 
 	 * @return Active
 	 */
 	public static Query findBy(Options options) {
 		logger.info("Running a customizable finder");
 
-		String sql = "SELECT entity FROM " + getClassName()
-				+ " entity WHERE entity."
-				+ options.getAttribute() + " LIKE '" + options.getAttributeValue() + "' ";
+		String sql = "SELECT entity FROM " + getClassName() 
+				+ " entity WHERE entity." + options.getAttribute()
+				+ " LIKE '" + options.getAttributeValue() + "' ";
 
-		if(options.isOrdanable()) {
+		if (options.isOrdanable()) {
 			sql += " ORDER BY " + options.getOrderAtribute() 
 				+ " " + options.getOrder().toString();
 		} else {
@@ -166,12 +167,12 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 		Query query = null;
 
 		try {
-			query = entityManager.createQuery(sql);
-		} catch(IllegalArgumentException illegalArgumentException) {
+			query = EntityManagerSingleton.get().createQuery(sql);
+		} catch (IllegalArgumentException illegalArgumentException) {
 			throw new IllegalArgumentException("Please, verify your options values.");
 		}
 
-		return query; 
+		return query;
 	}
 
 	/**
@@ -180,29 +181,30 @@ public abstract class ActiveRecord<ActiveType> implements Serializable{
 	 * @return one List of all instance
 	 */
 	public static List<Entity> all() {
-		return finder.all();
+		return FinderSingleton.get().all();
 	}
-	
+
+	@Inject
+	public void setEntityManager(EntityManager entityManager) {
+		EntityManagerSingleton.push(entityManager);
+	}
+
+	@Inject
+	public void setFinder(Finder finder) {
+		Finder myOwnfinder = finder;
+		myOwnfinder.setEntityClass(entityClass);
+
+		FinderSingleton.push(myOwnfinder);
+	}
+
 	private static String getClassName() {
 		return Thread.currentThread().getStackTrace()[2].getClassName();
 	}
 
 	/**
-	 * Set used entity manager
+	 * Interface to support lambda function
 	 */
-	@SuppressWarnings("static-access")
-	public void setEntityManager(EntityManager entityManager) {
-		// this set is only for tests
-		this.finder.setEntityManager(entityManager);
-
-		ActiveRecord.entityManager = entityManager;
-	}
-
-	public static EntityManager getEntityManager() {
-		return entityManager;
-	}
-
-	private static <Type> Type execute(Executor<Type> executor) {
-		return executor.execute(getEntityManager());
+	private <Type> Type execute(Executor<Type> executor) {
+		return executor.execute(EntityManagerSingleton.get());
 	}
 }
