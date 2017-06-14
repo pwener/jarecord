@@ -119,13 +119,11 @@ public abstract class ActiveRecord<ActiveType> implements Serializable {
 	 * 
 	 * @return first matched found with this attribute or null
 	 */
-	@SuppressWarnings("unchecked")
-	public static ActiveRecord<Entity> findBy(String attr, Object value) {
-		ActiveRecord<Entity> result = null;
+	public static ActiveRecord findBy(String attr, Object value) {
+		ActiveRecord result = null;
 
-		List<ActiveRecord<Entity>> allResults = new ArrayList<>();
-		allResults.addAll(
-				(ArrayList<? extends ActiveRecord<Entity>>) FinderSingleton.get()
+		List<ActiveRecord> allResults = new ArrayList<>();
+		allResults.addAll((Collection<? extends ActiveRecord>) FinderSingleton.get()
 					.get(attr, value));
 
 		if (!allResults.isEmpty()) {
